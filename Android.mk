@@ -23,7 +23,8 @@ common_c_includes := \
 	$(KERNEL_HEADERS) \
 	system/extras/ext4_utils \
 	external/openssl/include \
-	external/scrypt/lib/crypto
+	external/scrypt/lib/crypto \
+	external/e2fsprogs/lib
 
 common_shared_libraries := \
 	libsysutils \
@@ -33,7 +34,8 @@ common_shared_libraries := \
 	libhardware_legacy \
 	liblogwrap \
 	libext4_utils \
-	libcrypto
+	libcrypto \
+	libext2_blkid
 
 common_static_libraries := \
 	libfs_mgr \
@@ -41,6 +43,22 @@ common_static_libraries := \
 	libmincrypt
 
 include $(CLEAR_VARS)
+
+ifneq ($(TARGET_FUSE_SDCARD_UID),)
+LOCAL_CFLAGS += -DFUSE_SDCARD_UID=$(TARGET_FUSE_SDCARD_UID)
+endif
+
+ifneq ($(TARGET_FUSE_SDCARD_GID),)
+LOCAL_CFLAGS += -DFUSE_SDCARD_GID=$(TARGET_FUSE_SDCARD_GID)
+endif
+
+ifeq ($(BOARD_VOLD_EMMC_SHARES_DEV_MAJOR), true)
+LOCAL_CFLAGS += -DVOLD_EMMC_SHARES_DEV_MAJOR
+endif
+
+ifeq ($(BOARD_VOLD_DISC_HAS_MULTIPLE_MAJORS), true)
+LOCAL_CFLAGS += -DVOLD_DISC_HAS_MULTIPLE_MAJORS
+endif
 
 LOCAL_MODULE := libvold
 
@@ -67,6 +85,22 @@ LOCAL_SRC_FILES := \
 LOCAL_C_INCLUDES := $(common_c_includes)
 
 LOCAL_CFLAGS := -Werror=format
+
+ifneq ($(TARGET_FUSE_SDCARD_UID),)
+LOCAL_CFLAGS += -DFUSE_SDCARD_UID=$(TARGET_FUSE_SDCARD_UID)
+endif
+
+ifneq ($(TARGET_FUSE_SDCARD_GID),)
+LOCAL_CFLAGS += -DFUSE_SDCARD_GID=$(TARGET_FUSE_SDCARD_GID)
+endif
+
+ifeq ($(BOARD_VOLD_DISC_HAS_MULTIPLE_MAJORS), true)
+LOCAL_CFLAGS += -DVOLD_DISC_HAS_MULTIPLE_MAJORS
+endif
+
+ifeq ($(BOARD_VOLD_EMMC_SHARES_DEV_MAJOR), true)
+LOCAL_CFLAGS += -DVOLD_EMMC_SHARES_DEV_MAJOR
+endif
 
 LOCAL_SHARED_LIBRARIES := $(common_shared_libraries)
 
